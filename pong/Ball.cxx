@@ -1,6 +1,6 @@
 #include "Ball.h"
 
-#include <3dtypes/Vector3.h>
+#include <vertical3d/3dtypes/Vector3.h>
 
 #include <cmath>
 

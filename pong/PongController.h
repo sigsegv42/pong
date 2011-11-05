@@ -1,12 +1,12 @@
 #ifndef INCLUDED_PONG_CONTROLLER
 #define INCLUDED_PONG_CONTROLLER
 
-#include <hookah/Window.h>
+#include <vertical3d/hookah/Window.h>
 #include <luxa/ComponentManager.h>
 #include <luxa/Menu.h>
-#include <input/KeyboardDevice.h>
-#include <input/MouseDevice.h>
-#include <gui/InputEventAdapter.h>
+#include <vertical3d/input/KeyboardDevice.h>
+#include <vertical3d/input/MouseDevice.h>
+#include <vertical3d/gui/InputEventAdapter.h>
 
 class PongScene;
 class PongRenderer;

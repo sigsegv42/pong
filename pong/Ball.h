@@ -1,7 +1,7 @@
 #ifndef INCLUDED_PONG_BALL
 #define INCLUDED_PONG_BALL
 
-#include <3dtypes/Vector2.h>
+#include <vertical3d/3dtypes/Vector2.h>
 
 using namespace v3D;
 

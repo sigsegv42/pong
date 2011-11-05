@@ -1,7 +1,7 @@
 #ifndef INCLUDED_PONG_PADDLE
 #define INCLUDED_PONG_PADDLE
 
-#include <3dtypes/Color3.h>
+#include <vertical3d/3dtypes/Color3.h>
 
 using namespace v3D;
 

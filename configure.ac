@@ -104,7 +104,7 @@ AC_SUBST([PONG_SO_VERSION], [0:1:0])
 AC_SUBST([PONG_API_VERSION], [1.0])
 
 # save configure options in config.nice
-PONG_CONFIG_NICE([config.nice])
+V3D_CONFIG_NICE([config.nice])
 
 AC_CONFIG_FILES([
 Makefile 

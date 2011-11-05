@@ -3,8 +3,8 @@
 
 #include "PongScene.h"
 
-#include <hookah/Window.h>
-#include <font/FontCache.h>
+#include <vertical3d/hookah/Window.h>
+#include <vertical3d/font/FontCache.h>
 
 #include <boost/shared_ptr.hpp>
 

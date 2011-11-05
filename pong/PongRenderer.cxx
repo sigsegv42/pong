@@ -1,10 +1,12 @@
 #include "PongRenderer.h"
 
-#include <3dtypes/3dtypes.h>
+#include <vertical3d/3dtypes/3dtypes.h>
 #include <boost/lexical_cast.hpp>
 
-#include <windows.h>
-#include <gl/gl.h>
+#ifdef __WIN32
+  #include <windows.h>
+#endif
+#include <GL/gl.h>
 
 #include <cmath>
 #include <iostream>

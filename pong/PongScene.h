@@ -5,8 +5,8 @@
 #include "Paddle.h"
 #include "GameState.h"
 
-#include <audio/SoundEngine.h>
-#include <util/PropertyTree.h>
+#include <vertical3d/audio/SoundEngine.h>
+#include <vertical3d/util/PropertyTree.h>
 
 class PongScene
 {
