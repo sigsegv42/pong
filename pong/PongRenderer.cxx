@@ -1,6 +1,8 @@
 #include "PongRenderer.h"
 
 #include <vertical3d/3dtypes/3dtypes.h>
+#include <vertical3d/gl/GLFontRenderer.h>
+
 #include <boost/lexical_cast.hpp>
 
 #ifdef __WIN32
@@ -65,14 +67,15 @@ void PongRenderer::draw(Hookah::Window * window)
 	glOrtho(0, (float)width, (float)height, 0, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	boost::shared_ptr<v3D::Font2D> scoreFont = fonts_->get("score");
+	v3D::GLFontRenderer fontRenderer(*scoreFont);
 
 	// left score
 	std::string txt = boost::lexical_cast<std::string>(scene_->left().score());
-	scoreFont->print(txt, (width / 4.0f), (height / 4.0f));
+	fontRenderer.print(txt, (width / 4.0f), (height / 4.0f));
 
 	// right score
 	txt = boost::lexical_cast<std::string>(scene_->right().score());
-	scoreFont->print(txt, ((width / 4.0f) * 3.0f), (height / 4.0f));
+	fontRenderer.print(txt, ((width / 4.0f) * 3.0f), (height / 4.0f));
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);

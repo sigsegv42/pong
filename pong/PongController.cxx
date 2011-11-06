@@ -2,18 +2,23 @@
 #include "PongRenderer.h"
 #include "PongScene.h"
 
-#include <command/BindLoader.h>
+#include <vertical3d/command/BindLoader.h>
 #include <luxa/UILoader.h>
-#include <hookah/Hookah.h>
-#include <util/FileLog.h>
+#include <vertical3d/hookah/Hookah.h>
 
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 #include <iostream>
+
+#include <log4cxx/logger.h>
+#include <log4cxx/basicconfigurator.h>
+#include <log4cxx/helpers/exception.h>
 
 PongController::PongController()
 {
-	FileLog logger(L"debug.log");
+	//FileLog logger(L"debug.log");
+	log4cxx::BasicConfigurator::configure();
 
 	// create a new command directory object
 	directory_.reset(new v3D::CommandDirectory());
@@ -34,8 +39,8 @@ PongController::PongController()
 	window_->caption("Pong!");
 
 	// load config file into a property tree
-	PropertyTree ptree;
-	ptree.load("config.xml");
+	boost::property_tree::ptree ptree;
+	boost::property_tree::read_xml("config.xml", ptree);
 
 	// create the scene
 	scene_.reset(new PongScene(ptree));
@@ -76,7 +81,7 @@ PongController::PongController()
 	vgui_.reset(new Luxa::ComponentManager(renderer_->fonts(), directory_));
 	// load ui components (including fonts) from the config property tree
 	Luxa::UILoader ui_loader;
-	const PropertyTree & config = ptree.find("config");
+	boost::property_tree::ptree config = ptree.get_child("config");
 	ui_loader.load(config, &(*vgui_));
 
 	// register vgui event listeners

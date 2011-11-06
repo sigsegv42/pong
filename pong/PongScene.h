@@ -6,12 +6,13 @@
 #include "GameState.h"
 
 #include <vertical3d/audio/SoundEngine.h>
-#include <vertical3d/util/PropertyTree.h>
+
+#include <boost/property_tree/ptree.hpp>
 
 class PongScene
 {
 	public:
-		PongScene(PropertyTree & ptree);
+		PongScene(const boost::property_tree::ptree & ptree);
 		~PongScene();
 
 		void tick(unsigned int delta);

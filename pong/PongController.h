@@ -35,7 +35,7 @@ class PongController
 		boost::shared_ptr<v3D::KeyboardDevice> keyboard_;
 		boost::shared_ptr<v3D::MouseDevice> mouse_;
 		boost::shared_ptr<v3D::CommandDirectory> directory_;
-		boost::shared_ptr<InputEventAdapter> listenerAdapter_;
+		boost::shared_ptr<v3D::InputEventAdapter> listenerAdapter_;
 };
 
 #endif // INCLUDED_PONG_CONTROLLER

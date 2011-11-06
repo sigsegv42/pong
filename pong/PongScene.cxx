@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-PongScene::PongScene(PropertyTree & ptree)
+PongScene::PongScene(const boost::property_tree::ptree & ptree)
 {
 	left_.color(Color3(1.0f, 1.0f, 1.0f), Color3(1.0f, 1.0f, 1.0f));
 	right_.color(Color3(1.0f, 1.0f, 1.0f), Color3(1.0f, 1.0f, 1.0f));

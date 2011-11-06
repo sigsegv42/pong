@@ -43,6 +43,8 @@ PKG_CHECK_MODULES([freealut], [freealut])
 # libhookah needs sdl
 PKG_CHECK_MODULES([sdl], [sdl])
 
+PKG_CHECK_MODULES([luxa], [luxa])
+
 AC_ARG_WITH(jpeg, 
 	[AC_HELP_STRING([--with-jpeg=<DIR>],
     [Provide an alternative path to the libJPEG library directory])],
