@@ -3,7 +3,7 @@
 
 #include <vertical3d/hookah/Window.h>
 #include <luxa/ComponentManager.h>
-#include <luxa/Menu.h>
+#include <luxa/menu/Menu.h>
 #include <vertical3d/input/KeyboardDevice.h>
 #include <vertical3d/input/MouseDevice.h>
 #include <vertical3d/gui/InputEventAdapter.h>
@@ -17,7 +17,7 @@ class PongRenderer;
 class PongController
 {
 	public:
-		PongController();
+		PongController(const std::string & path);
 
 		bool run();
 

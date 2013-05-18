@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BFF570B8-5147-4D0F-A291-A34757552491}"
 	ProjectSection(SolutionItems) = preProject
 		pong\ChangeLog.txt = pong\ChangeLog.txt
@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		ReadMe.txt = ReadMe.txt
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pong", "pong\pong.vcproj", "{B79E5AB5-ECBD-4B9F-8E7D-8820D59C3E18}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pong", "pong\pong.vcxproj", "{B79E5AB5-ECBD-4B9F-8E7D-8820D59C3E18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

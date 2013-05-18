@@ -15,7 +15,7 @@
 #include <log4cxx/basicconfigurator.h>
 #include <log4cxx/helpers/exception.h>
 
-PongController::PongController()
+PongController::PongController(const std::string & path)
 {
 	//FileLog logger(L"debug.log");
 	log4cxx::BasicConfigurator::configure();
@@ -27,7 +27,7 @@ PongController::PongController()
 	window_ = Hookah::Create3DWindow(800, 600);
 
 	// create input devices
-	keyboard_ = boost::shared_dynamic_cast<v3D::KeyboardDevice, v3D::InputDevice>(Hookah::CreateInputDevice("keyboard"));
+	keyboard_ = boost::dynamic_pointer_cast<v3D::KeyboardDevice, v3D::InputDevice>(Hookah::CreateInputDevice("keyboard"));
 
 	// register directory as an observer of input device events
 	listenerAdapter_.reset(new InputEventAdapter(keyboard_, mouse_));
@@ -40,7 +40,8 @@ PongController::PongController()
 
 	// load config file into a property tree
 	boost::property_tree::ptree ptree;
-	boost::property_tree::read_xml("config.xml", ptree);
+	std::string configFile = path + std::string("config.xml");
+	boost::property_tree::read_xml(configFile, ptree);
 
 	// create the scene
 	scene_.reset(new PongScene(ptree));
