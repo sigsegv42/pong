@@ -1,11 +1,15 @@
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
+
 #include "PongScene.h"
 
 #include <iostream>
 
 PongScene::PongScene(const boost::property_tree::ptree & ptree)
 {
-	left_.color(Color3(1.0f, 1.0f, 1.0f), Color3(1.0f, 1.0f, 1.0f));
-	right_.color(Color3(1.0f, 1.0f, 1.0f), Color3(1.0f, 1.0f, 1.0f));
+	left_.color(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+	right_.color(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// load all of the sound clips
 	if (!soundEngine_.load(ptree))
@@ -29,7 +33,10 @@ void PongScene::resize(int width, int height)
 void PongScene::tick(unsigned int delta)
 {
 	if (gameState_.paused())
+	{
 		return;
+	}
+
 	// check for victory conditions
 	if (left_.score() == gameState_.maxScore() || 
 		right_.score() == gameState_.maxScore())
@@ -39,8 +46,8 @@ void PongScene::tick(unsigned int delta)
 		// play victory sound
 		soundEngine_.playClip("victory");
 	}
-	Vector2 ball_pos = ball_.position();
-	Vector2 ball_dir = ball_.direction();
+	glm::vec2 ball_pos = ball_.position();
+	glm::vec2 ball_dir = ball_.direction();
 
 	// give AI a turn in single player mode
 	if (!gameState_.coop())
@@ -81,12 +88,12 @@ void PongScene::tick(unsigned int delta)
 		(ball_pos[0] <= ((gameState_.ballSize() / 2.0f) + paddle_size)))
 	{
 		// alter ball direction
-		Vector2 ball_dir = ball_.direction();
+		glm::vec2 ball_dir = ball_.direction();
 		ball_dir = -ball_dir;
 		if (left_.down())
-			ball_dir += Vector2(0.0f, -0.015f);
+			ball_dir += glm::vec2(0.0f, -0.015f);
 		else if (left_.up())
-			ball_dir -= Vector2(0.0f, -0.015f);
+			ball_dir -= glm::vec2(0.0f, -0.015f);
 		// speed the ball up slightly
 		ball_dir *= gameState_.ballSpeedup();
 
@@ -100,12 +107,12 @@ void PongScene::tick(unsigned int delta)
 			(ball_pos[0] >= (width_ - ((gameState_.ballSize() / 2.0f) + paddle_size))))
 	{
 		// alter ball direction
-		Vector2 ball_dir = ball_.direction();
+		glm::vec2 ball_dir = ball_.direction();
 		ball_dir = -ball_dir;
 		if (right_.down())
-			ball_dir += Vector2(0.0f, 0.015f);
+			ball_dir += glm::vec2(0.0f, 0.015f);
 		else if (right_.up())
-			ball_dir -= Vector2(0.0f, 0.015f);
+			ball_dir -= glm::vec2(0.0f, 0.015f);
 		// speed the ball up slightly
 		ball_dir *= gameState_.ballSpeedup();
 
@@ -142,12 +149,12 @@ void PongScene::tick(unsigned int delta)
 		// reposition the ball in the center of the screen
 		float mid_y = height_ / 2.0f;
 		float mid_x = width_ / 2.0f;
-		Vector2 v(mid_x, mid_y);
+		glm::vec2 v(mid_x, mid_y);
 		ball_.position(v);
 		// set the ball rolling
 		float speed = gameState_.ballStartSpeed() * gameState_.ballSpeedup();
 		// last winner serves the ball
-		Vector2 dir(speed * victor, 0.0f);
+		glm::vec2 dir(speed * victor, 0.0f);
 		ball_.direction(dir);
 		// start at this slightly faster speed next time
 		gameState_.ballStartSpeed(speed);
@@ -161,7 +168,7 @@ void PongScene::tick(unsigned int delta)
 	// direction of the ball so it bounces off
 	if (ball_pos[1] >= ((height_ - 15.0f) - (gameState_.ballSize() / 2.0f)))
 	{
-		Vector2 ball_dir = ball_.direction();
+		glm::vec2 ball_dir = ball_.direction();
 		ball_dir[1] = -ball_dir[1];
 		ball_.direction(ball_dir);
 
@@ -170,7 +177,7 @@ void PongScene::tick(unsigned int delta)
 	}
 	else if (ball_pos[1] <= (15.0f - (gameState_.ballSize() / 2.0f)))
 	{
-		Vector2 ball_dir = ball_.direction();
+		glm::vec2 ball_dir = ball_.direction();
 		ball_dir[1] = -ball_dir[1];
 		ball_.direction(ball_dir);
 
@@ -179,17 +186,20 @@ void PongScene::tick(unsigned int delta)
 	}
 
 
+	float step = 1.5f;
+	float bottom = 560.0f;
+	float top = 40.0f;
 	if (left_.up())
 	{
 		///FIXME: use "Uint32 SDL_GetTicks(void)" to work out a movement delta
 		///		  use variables for screen extents and paddle sizes
-		if (left_.position() < 575.0f)
-			left_.position(left_.position() + 0.075f);
+		if (left_.position() > top)
+			left_.position(left_.position() - step);
 	}
 	else if (left_.down())
 	{
-		if (left_.position() > 25.0f)
-			left_.position(left_.position() - 0.075f);
+		if (left_.position() < bottom)
+			left_.position(left_.position() + step);
 	}
 	else
 	{
@@ -197,13 +207,13 @@ void PongScene::tick(unsigned int delta)
 
 	if (right_.up())
 	{
-		if (right_.position() < 575.0f)
-			right_.position(right_.position() + 0.075f);
+		if (right_.position() > top)
+			right_.position(right_.position() - step);
 	}
 	else if (right_.down())
 	{
-		if (right_.position() > 25.0f)
-			right_.position(right_.position() - 0.075f);
+		if (right_.position() < bottom)
+			right_.position(right_.position() + step);
 	}
 	else
 	{
@@ -222,10 +232,11 @@ void PongScene::reset()
 	right_.offset(785.0f);
 
 	// this is the ball's starting position
-	Vector2 v(mid_x, mid_y);
+	glm::vec2 v(mid_x, mid_y);
 	ball_.position(v);
 	// ... and direction
-	Vector2 dir(-0.055f, 0.0f);
+	float speed = gameState_.ballStartSpeed();
+	glm::vec2 dir(-speed, 0.0f);
 	ball_.direction(dir);
 	// ... and size
 	ball_.size(gameState_.ballSize());

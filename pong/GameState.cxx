@@ -18,8 +18,8 @@ bool GameState::paused() const
 void GameState::reset()
 {
 	// percentage to increase ball speed each round
-	ballSpeedup_ = 1.20f;
-	ballStartSpeed_ = 0.055f;
+	ballSpeedup_ = 1.0f;
+	ballStartSpeed_ = 1.0f;
 	paused_ = false;
 }
 

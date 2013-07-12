@@ -1,7 +1,15 @@
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
+
 #include "PongRenderer.h"
 
 #include <vertical3d/3dtypes/3dtypes.h>
 #include <vertical3d/gl/GLFontRenderer.h>
+#include <vertical3d/gl/Shader.h>
+
+#include <stark/AssetLoader.h>
+#include <stark/ProgramFactory.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -10,14 +18,25 @@
 #include <cmath>
 #include <iostream>
 
-PongRenderer::PongRenderer(boost::shared_ptr<PongScene> scene) : scene_(scene), fonts_(new v3D::FontCache())
+PongRenderer::PongRenderer(boost::shared_ptr<PongScene> scene, boost::shared_ptr<AssetLoader> & loader) : scene_(scene), fonts_(new v3D::FontCache())
 {
-	glShadeModel(GL_SMOOTH);
+	ProgramFactory factory(loader);
+	boost::shared_ptr<v3D::Program> program = factory.create(v3D::Shader::SHADER_TYPE_VERTEX|v3D::Shader::SHADER_TYPE_FRAGMENT, "shaders/canvas");
+
+	canvas_.reset(new v3D::Canvas(program));
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glDepthRange(0.0f, 1.0f);
+	glEnable(GL_DEPTH_CLAMP);
+	// CCW winding is default
+	glFrontFace(GL_CCW);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 boost::shared_ptr<v3D::FontCache> PongRenderer::fonts() const
@@ -29,40 +48,19 @@ void PongRenderer::resize(int width, int height)
 {
 	scene_->resize(width, height);
 
-	GLfloat ratio;
-
-	if (height == 0)
-		height = 1;
-
-	ratio = (GLfloat)width / (GLfloat)height;
-
-	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-    glOrtho(0, width, 0, height, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	canvas_->resize(width, height);
 }
 
 void PongRenderer::draw(Hookah::Window * window)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glLoadIdentity();
+	canvas_->clear();
 
-	glColor3f(0.35f, 0.35f, 0.35f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	int width = window->width();
 	int height = window->height();
 
 	// draw the scoreboard
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	// map top left to (0,0)
-	glOrtho(0, (float)width, (float)height, 0, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
 	boost::shared_ptr<v3D::Font2D> scoreFont = fonts_->get("score");
 	v3D::GLFontRenderer fontRenderer(*scoreFont);
 
@@ -73,84 +71,52 @@ void PongRenderer::draw(Hookah::Window * window)
 	// right score
 	txt = boost::lexical_cast<std::string>(scene_->right().score());
 	fontRenderer.print(txt, ((width / 4.0f) * 3.0f), (height / 4.0f));
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
 
 	// draw the gameboard
 
 	// center line
-	glBegin(GL_QUADS);
-	glVertex2i(((width / 2) - 7), 0);
-	glVertex2i(((width / 2) + 7), 0);
-	glVertex2i(((width / 2) + 7), height);
-	glVertex2i(((width / 2) - 7), height);
-	glEnd();
-
-	// top wall
-	glBegin(GL_QUADS);
-	glVertex2i(0, height);
-	glVertex2i(width, height);
-	glVertex2i(width, (height - 15));
-	glVertex2i(0, (height - 15));
-	glEnd();
+	glm::vec3 color(0.35f, 0.35f, 0.35f);
+	canvas_->rect(((width / 2) - 7), ((width / 2) + 7), 0, height, color);
 
 	// bottom wall
-	glBegin(GL_QUADS);
-	glVertex2i(0, 0);
-	glVertex2i(width, 0);
-	glVertex2i(width, 15);
-	glVertex2i(0, 15);
-	glEnd();
+	canvas_->rect(0, width, height - 15, height, color);
 
-	glColor3f(1.0f, 1.0f, 1.0f);
+	// top wall
+	canvas_->rect(0, width, 0, 15, color);
 
 	// draw the paddles and ball
 	drawPaddle(scene_->left());
 	drawPaddle(scene_->right());
 
 	drawBall();
+
+	// upload to GPU & render
+	canvas_->upload();
+	canvas_->render();
 }
 
 void PongRenderer::drawBall()
 {
 	int sides = 32;
-	v3D::Vector2 position = scene_->ball().position();
+	glm::vec2 position = scene_->ball().position();
 
-	glPushMatrix();
-	glTranslatef(position[0], position[1], 0.0f);
+	canvas_->push();
+	canvas_->translate(position);
+	glm::vec3 color(1.0f, 1.0f, 1.0f);
+	canvas_->circle(sides, scene_->ball().size(), color);
 
-	float delta = 2.0f * PI / sides;
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glBegin(GL_POLYGON);
-	for (int k = 0; k < sides; k++)
-	{
-		Vector3 p;
-		p[0] = 0.0;
-		p[1] = cos(delta * k) * scene_->ball().size();
-		p[2] = sin(delta * k) * scene_->ball().size();
-		glVertex2f(p[1], p[2]);
-	}
-	glEnd();
-	glPopMatrix();
+	canvas_->pop();
 }
 
 void PongRenderer::drawPaddle(const Paddle & paddle)
 {
-	glPushMatrix();
-	v3D::Color3 color1 = paddle.color1();
-	v3D::Color3 color2 = paddle.color2();
+	canvas_->push();
+	glm::vec3 color1 = paddle.color1();
+	glm::vec3 color2 = paddle.color2();
 	// use a translation to get to object space
 	// offsetting y so our origin is the left corner
 	// x is adjusted depending on which side of the screen the paddle is on
-	glTranslatef(paddle.offset(), paddle.position() - 25.0f, 0.0f);
-	glBegin(GL_QUADS);
-    glColor3f(color1[0], color1[1], color1[2]);
-    glVertex2f(0.0f, 0.0f);
-    glVertex2f(0.0f, 50.0f);
-    glColor3f(color2[1], color2[1], color2[2]);
-    glVertex2f(15.0f, 50.0f);
-    glVertex2f(15.0f, 0.0f);
-    glEnd();
-	glPopMatrix();
+	canvas_->translate(glm::vec2(paddle.offset(), paddle.position() - 25));
+	canvas_->rect(0, 15, 0, 50, color1);
+	canvas_->pop();
 }

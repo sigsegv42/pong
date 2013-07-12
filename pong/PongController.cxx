@@ -1,10 +1,15 @@
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
+
 #include "PongController.h"
 #include "PongRenderer.h"
 #include "PongScene.h"
 
 #include <vertical3d/command/BindLoader.h>
-#include <luxa/UILoader.h>
 #include <vertical3d/hookah/Hookah.h>
+#include <luxa/UILoader.h>
+#include <stark/AssetLoader.h>
 
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
@@ -30,7 +35,7 @@ PongController::PongController(const std::string & path)
 	keyboard_ = boost::dynamic_pointer_cast<v3D::KeyboardDevice, v3D::InputDevice>(Hookah::CreateInputDevice("keyboard"));
 
 	// register directory as an observer of input device events
-	listenerAdapter_.reset(new InputEventAdapter(keyboard_, mouse_));
+	listenerAdapter_.reset(new v3D::InputEventAdapter(keyboard_, mouse_));
 	listenerAdapter_->connect(directory_.get());
 
 	// add device to window
@@ -46,7 +51,8 @@ PongController::PongController(const std::string & path)
 	// create the scene
 	scene_.reset(new PongScene(ptree));
 	// ...and the renderer
-	renderer_.reset(new PongRenderer(scene_));
+	boost::shared_ptr<AssetLoader> loader(new AssetLoader(path, "pong.log"));
+	renderer_.reset(new PongRenderer(scene_, loader));
 
 	// register game commands
 	// play commands
@@ -84,7 +90,7 @@ PongController::PongController(const std::string & path)
 	Luxa::UILoader ui_loader;
 	boost::property_tree::ptree config = ptree.get_child("config");
 	ui_loader.load(config, &(*vgui_));
-
+/*
 	// register vgui event listeners
 	window_->addPostDrawListener(boost::bind(&Luxa::ComponentManager::draw, boost::ref(vgui_), _1));
 	window_->addResizeListener(boost::bind(&Luxa::ComponentManager::resize, boost::ref(vgui_), _1, _2));
@@ -94,6 +100,7 @@ PongController::PongController(const std::string & path)
 	vgui_->resize(window_->width(), window_->height());
 
 	setMenuItemDefaults(boost::dynamic_pointer_cast<Luxa::Menu, Luxa::Component>(vgui_->getComponent("game-menu")));
+*/
 }
 
 bool PongController::run()

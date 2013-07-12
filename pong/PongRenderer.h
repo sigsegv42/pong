@@ -1,3 +1,7 @@
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
+
 #ifndef INCLUDED_PONG_RENDERER
 #define INCLUDED_PONG_RENDERER
 
@@ -5,13 +9,16 @@
 
 #include <vertical3d/hookah/Window.h>
 #include <vertical3d/font/FontCache.h>
+#include <vertical3d/gl/Canvas.h>
 
 #include <boost/shared_ptr.hpp>
+
+class AssetLoader;
 
 class PongRenderer
 {
 	public:
-		PongRenderer(boost::shared_ptr<PongScene> scene);
+		PongRenderer(boost::shared_ptr<PongScene> scene, boost::shared_ptr<AssetLoader> & loader);
 
 		void draw(Hookah::Window * window);
 		void resize(int width, int height);
@@ -24,6 +31,7 @@ class PongRenderer
 	private:
 		boost::shared_ptr<PongScene> scene_;
 		boost::shared_ptr<v3D::FontCache> fonts_;
+		boost::shared_ptr<v3D::Canvas> canvas_;
 };
 
 #endif // INCLUDED_PONG_RENDERER

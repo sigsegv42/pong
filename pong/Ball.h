@@ -1,20 +1,22 @@
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
+
 #ifndef INCLUDED_PONG_BALL
 #define INCLUDED_PONG_BALL
 
-#include <vertical3d/3dtypes/Vector2.h>
-
-using namespace v3D;
+#include <glm/glm.hpp>
 
 class Ball
 {
 	public:
 		Ball();
 
-		void direction(const Vector2 & dir);
-		Vector2 direction() const;
+		void direction(const glm::vec2 & dir);
+		glm::vec2 direction() const;
 
-		Vector2 position() const;
-		void position(const Vector2 & pos);
+		glm::vec2 position() const;
+		void position(const glm::vec2 & pos);
 
 		void move();
 
@@ -22,8 +24,8 @@ class Ball
 		void size(float s);
 
 	private:
-		Vector2 position_;
-		Vector2 direction_;
+		glm::vec2 position_;
+		glm::vec2 direction_;
 		float size_;
 };
 

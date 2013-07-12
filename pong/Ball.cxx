@@ -1,6 +1,8 @@
-#include "Ball.h"
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
 
-#include <vertical3d/3dtypes/Vector3.h>
+#include "Ball.h"
 
 #include <cmath>
 
@@ -10,22 +12,22 @@ Ball::Ball() : size_(1.0f)
 }
 
 
-void Ball::direction(const Vector2 & dir)
+void Ball::direction(const glm::vec2 & dir)
 {
 	direction_ = dir;
 }
 
-Vector2 Ball::direction() const
+glm::vec2 Ball::direction() const
 {
 	return direction_;
 }
 
-Vector2 Ball::position() const
+glm::vec2 Ball::position() const
 {
 	return position_;
 }
 
-void Ball::position(const Vector2 & pos)
+void Ball::position(const glm::vec2 & pos)
 {
 	position_ = pos;
 }

@@ -1,3 +1,7 @@
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
+
 #ifndef INCLUDED_PONG_SCENE
 #define INCLUDED_PONG_SCENE
 

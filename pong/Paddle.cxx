@@ -1,22 +1,32 @@
+/**
+ * Pong! - (c) Joshua Farr <j.wgasa@gmail.com>
+ */
+
 #include "Paddle.h"
 
-Paddle::Paddle() : position_(0.0f), offset_(0.0f), 
-		up_(false), down_(false), score_(0), length_(50.0f), size_(15.0f)
+Paddle::Paddle() : 
+	position_(0.0f), 
+	offset_(0.0f), 
+	up_(false), 
+	down_(false), 
+	score_(0), 
+	length_(50.0f), 
+	size_(15.0f)
 {
 }
 
-Color3 Paddle::color1(void) const
+glm::vec3 Paddle::color1() const
 {
 	return color1_;
 }
 
-Color3 Paddle::color2(void) const
+glm::vec3 Paddle::color2() const
 {
 	return color2_;
 }
 
 
-void Paddle::color(const Color3 & color1, const Color3 & color2)
+void Paddle::color(const glm::vec3 & color1, const glm::vec3 & color2)
 {
     color1_ = color1;
     color2_ = color2;
