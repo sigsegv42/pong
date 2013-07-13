@@ -5,8 +5,10 @@
 #include "PongRenderer.h"
 
 #include <vertical3d/3dtypes/3dtypes.h>
-#include <vertical3d/gl/GLFontRenderer.h>
+//#include <vertical3d/gl/GLFontRenderer.h>
 #include <vertical3d/gl/Shader.h>
+#include <vertical3d/font/TextureFontCache.h>
+#include <vertical3d/font/TextureTextBuffer.h>
 
 #include <stark/AssetLoader.h>
 #include <stark/ProgramFactory.h>
@@ -27,16 +29,44 @@ PongRenderer::PongRenderer(boost::shared_ptr<PongScene> scene, boost::shared_ptr
 
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 	glDepthRange(0.0f, 1.0f);
 	glEnable(GL_DEPTH_CLAMP);
 	// CCW winding is default
 	glFrontFace(GL_CCW);
 	glActiveTexture(GL_TEXTURE0);
+
+	// setup text buffer
+	boost::shared_ptr<v3D::Program> textProgram = factory.create(v3D::Shader::SHADER_TYPE_VERTEX|v3D::Shader::SHADER_TYPE_FRAGMENT, "shaders/text");
+	boost::shared_ptr<v3D::TextureTextBuffer> text;
+	text.reset(new v3D::TextureTextBuffer(v3D::TextureTextBuffer::LCD_FILTERING_ON));
+	fontRenderer_.reset(new v3D::TextureFontRenderer(text, textProgram));
+
+	markup_.bold_ = false;
+	markup_.italic_ = false;
+	markup_.rise_ = 0.0f;
+	markup_.spacing_ = 0.0f;
+	markup_.gamma_ = 0.5f;
+	markup_.underline_ = false;
+	markup_.overline_ = false;
+	markup_.strikethrough_ = false;
+	markup_.foregroundColor_ = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	markup_.backgroundColor_ = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	markup_.size_ = 64.0f;
+
+	// characters to cache
+	const wchar_t *charcodes =  L" !\"#$%&'()*+,-./0123456789:;<=>?"
+								L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+								L"`abcdefghijklmnopqrstuvwxyz{|}~";
+	text->cache()->charcodes(charcodes);
+
+	std::string filename = loader->path() + std::string("fonts/DroidSerif-Regular.ttf");
+	markup_.font_ = text->cache()->load(filename, markup_.size_);
+
 }
 
 boost::shared_ptr<v3D::FontCache> PongRenderer::fonts() const
@@ -44,11 +74,14 @@ boost::shared_ptr<v3D::FontCache> PongRenderer::fonts() const
 	return fonts_;
 }
 
+
 void PongRenderer::resize(int width, int height)
 {
 	scene_->resize(width, height);
-
 	canvas_->resize(width, height);
+	float w = static_cast<float>(width);
+	float h = static_cast<float>(height);
+	fontRenderer_->resize(w, h);
 }
 
 void PongRenderer::draw(Hookah::Window * window)
@@ -61,16 +94,24 @@ void PongRenderer::draw(Hookah::Window * window)
 	int height = window->height();
 
 	// draw the scoreboard
-	boost::shared_ptr<v3D::Font2D> scoreFont = fonts_->get("score");
-	v3D::GLFontRenderer fontRenderer(*scoreFont);
+	fontRenderer_->buffer()->clear();
+	std::stringstream txt;
 
 	// left score
-	std::string txt = boost::lexical_cast<std::string>(scene_->left().score());
-	fontRenderer.print(txt, (width / 4.0f), (height / 4.0f));
+	txt << boost::lexical_cast<std::string>(scene_->left().score());
+	glm::vec2 pen(width / 4.0f, height / 4.0f);
+	std::string buffer = txt.str();
+	std::wstring widestr = std::wstring(buffer.begin(), buffer.end());
+	fontRenderer_->buffer()->addText(pen, markup_, widestr.c_str());
 
 	// right score
-	txt = boost::lexical_cast<std::string>(scene_->right().score());
-	fontRenderer.print(txt, ((width / 4.0f) * 3.0f), (height / 4.0f));
+	txt.str("");
+	txt.clear();
+	pen = glm::vec2(((width / 4.0f) * 3.0f), (height / 4.0f));
+	txt << boost::lexical_cast<std::string>(scene_->right().score());
+	buffer = txt.str();
+	widestr = std::wstring(buffer.begin(), buffer.end());
+	fontRenderer_->buffer()->addText(pen, markup_, widestr.c_str());
 
 	// draw the gameboard
 
@@ -92,7 +133,10 @@ void PongRenderer::draw(Hookah::Window * window)
 
 	// upload to GPU & render
 	canvas_->upload();
+	fontRenderer_->upload();
+
 	canvas_->render();
+	fontRenderer_->render();
 }
 
 void PongRenderer::drawBall()
