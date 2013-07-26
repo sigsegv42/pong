@@ -5,16 +5,18 @@
 #include "PongScene.h"
 
 #include <iostream>
+#include <log4cxx/logger.h>
 
-PongScene::PongScene(const boost::property_tree::ptree & ptree)
+PongScene::PongScene(const boost::property_tree::ptree & ptree, const std::string & assetPath)
 {
 	left_.color(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 	right_.color(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// load all of the sound clips
-	if (!soundEngine_.load(ptree))
+	if (!soundEngine_.load(ptree, assetPath))
 	{
-		std::cerr << "error loading sounds" << std::endl;
+		log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("pong.log"));
+		LOG4CXX_ERROR(logger, "error loading sounds");
 		return;
 	}
 }

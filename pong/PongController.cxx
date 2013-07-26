@@ -49,7 +49,7 @@ PongController::PongController(const std::string & path)
 	boost::property_tree::read_xml(configFile, ptree);
 
 	// create the scene
-	scene_.reset(new PongScene(ptree));
+	scene_.reset(new PongScene(ptree, path));
 	// ...and the renderer
 	boost::shared_ptr<AssetLoader> loader(new AssetLoader(path, "pong.log"));
 	renderer_.reset(new PongRenderer(scene_, loader));

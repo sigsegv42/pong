@@ -10,6 +10,7 @@
 #include <vertical3d/hookah/Window.h>
 #include <vertical3d/gl/Canvas.h>
 #include <vertical3d/gl/TextureFontRenderer.h>
+#include <vertical3d/font/TextureFontCache.h>
 #include <vertical3d/font/FontCache.h>
 
 #include <boost/shared_ptr.hpp>
@@ -35,6 +36,7 @@ class PongRenderer
 		boost::shared_ptr<v3D::Canvas> canvas_;
 		v3D::TextureTextBuffer::Markup markup_;
 		boost::shared_ptr<v3D::TextureFontRenderer> fontRenderer_;
+		boost::shared_ptr<v3D::TextureFontCache> fontCache_;
 };
 
 #endif // INCLUDED_PONG_RENDERER

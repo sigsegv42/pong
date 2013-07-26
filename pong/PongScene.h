@@ -16,7 +16,7 @@
 class PongScene
 {
 	public:
-		PongScene(const boost::property_tree::ptree & ptree);
+		PongScene(const boost::property_tree::ptree & ptree, const std::string & assetPath);
 		~PongScene();
 
 		void tick(unsigned int delta);

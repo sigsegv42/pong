@@ -5,9 +5,7 @@
 #include "PongRenderer.h"
 
 #include <vertical3d/3dtypes/3dtypes.h>
-//#include <vertical3d/gl/GLFontRenderer.h>
 #include <vertical3d/gl/Shader.h>
-#include <vertical3d/font/TextureFontCache.h>
 #include <vertical3d/font/TextureTextBuffer.h>
 
 #include <stark/AssetLoader.h>
@@ -42,9 +40,7 @@ PongRenderer::PongRenderer(boost::shared_ptr<PongScene> scene, boost::shared_ptr
 
 	// setup text buffer
 	boost::shared_ptr<v3D::Program> textProgram = factory.create(v3D::Shader::SHADER_TYPE_VERTEX|v3D::Shader::SHADER_TYPE_FRAGMENT, "shaders/text");
-	boost::shared_ptr<v3D::TextureTextBuffer> text;
-	text.reset(new v3D::TextureTextBuffer(v3D::TextureTextBuffer::LCD_FILTERING_ON));
-	fontRenderer_.reset(new v3D::TextureFontRenderer(text, textProgram));
+	fontCache_.reset(new v3D::TextureFontCache(512, 512, v3D::TextureTextBuffer::LCD_FILTERING_ON));
 
 	markup_.bold_ = false;
 	markup_.italic_ = false;
@@ -62,11 +58,14 @@ PongRenderer::PongRenderer(boost::shared_ptr<PongScene> scene, boost::shared_ptr
 	const wchar_t *charcodes =  L" !\"#$%&'()*+,-./0123456789:;<=>?"
 								L"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
 								L"`abcdefghijklmnopqrstuvwxyz{|}~";
-	text->cache()->charcodes(charcodes);
+	fontCache_->charcodes(charcodes);
 
 	std::string filename = loader->path() + std::string("fonts/DroidSerif-Regular.ttf");
-	markup_.font_ = text->cache()->load(filename, markup_.size_);
+	markup_.font_ = fontCache_->load(filename, markup_.size_);
 
+	boost::shared_ptr<v3D::TextureTextBuffer> text;
+	text.reset(new v3D::TextureTextBuffer());
+	fontRenderer_.reset(new v3D::TextureFontRenderer(text, textProgram, fontCache_->atlas()));
 }
 
 boost::shared_ptr<v3D::FontCache> PongRenderer::fonts() const
